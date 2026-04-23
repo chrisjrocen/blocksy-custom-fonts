@@ -79,7 +79,9 @@ function bcf_add_font_sources( array $sources ): array {
 	}
 
 	if ( ! empty( $families ) ) {
-		$sources['custom'] = [
+		// Use a unique key so we never overwrite another plugin/theme that
+		// also writes to 'custom' (e.g. the child theme's twr_add_font_sources).
+		$sources['bcf_custom'] = [
 			'type'     => 'custom',
 			'families' => $families,
 		];
