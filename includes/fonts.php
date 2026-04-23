@@ -178,16 +178,14 @@ function bcf_allow_font_mimes( array $mimes ): array {
 	return $mimes;
 }
 
-// wp_check_filetype_and_ext validates the real MIME; for font binaries it
-// often returns empty, so we trust the extension for known font types.
+// finfo often mis-identifies font binaries (e.g. OTF → font/sfnt or
+// application/octet-stream), causing WordPress to set ext/type to false.
+// We always override for known font extensions, regardless of what finfo says.
 add_filter( 'wp_check_filetype_and_ext', 'bcf_fix_font_filetype', 10, 4 );
 
-function bcf_fix_font_filetype( array $data, string $file, string $filename, array $mimes ): array {
-	if ( ! empty( $data['ext'] ) ) {
-		return $data;
-	}
-
+function bcf_fix_font_filetype( array $data, string $file, string $filename, array|null $mimes ): array {
 	$ext = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
+
 	$font_map = [
 		'woff'  => 'font/woff',
 		'woff2' => 'font/woff2',
